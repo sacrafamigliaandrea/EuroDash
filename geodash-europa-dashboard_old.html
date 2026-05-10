@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoDash Europa · Dashboard Docente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050b1a;
+  --bg2: #0a1428;
+  --panel: #0d1f3c;
+  --panel2: #122a52;
+  --border: rgba(0,229,255,0.18);
+  --accent: #00e5ff;
+  --accent2: #ff6b35;
+  --accent3: #39ff14;
+  --gold: #ffd700;
+  --text: #e8f4ff;
+  --dim: #8aadc8;
+  --warn: #ffb84d;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ─── LOGIN OVERLAY (AES-256-GCM) ─── */
+#login-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background:
+    radial-gradient(ellipse at top left, rgba(0,229,255,0.12), transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(255,107,53,0.08), transparent 50%),
+    var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.login-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 42px 36px;
+  max-width: 440px; width: 100%;
+  box-shadow: 0 0 0 1px rgba(0,229,255,0.1), 0 0 60px rgba(0,229,255,0.1);
+  text-align: center;
+}
+.login-card h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent), #fff, var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+}
+.login-card .sub {
+  font-size: 11px;
+  color: var(--dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+.login-card input[type="password"] {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'Space Mono', monospace;
+  font-size: 15px;
+  letter-spacing: 2px;
+  text-align: center;
+  transition: all 0.2s;
+  margin-bottom: 14px;
+}
+.login-card input[type="password"]:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,229,255,0.12);
+}
+.login-card input.shake {
+  animation: shake 0.4s;
+  border-color: var(--warn);
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+.login-card button {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: 10px;
+  color: #000;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.25s;
+  text-transform: uppercase;
+}
+.login-card button:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,229,255,0.3); }
+.login-card button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+.login-card .err {
+  display: none;
+  margin-top: 12px;
+  padding: 8px 12px;
+  font-size: 11px;
+  color: var(--warn);
+  letter-spacing: 1px;
+  font-family: 'Space Mono', monospace;
+  text-transform: uppercase;
+}
+.login-card .err.show { display: block; }
+.login-card .config-warn-login {
+  display: none;
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: rgba(255,184,77,0.1);
+  border-left: 3px solid var(--warn);
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--text);
+  text-align: left;
+  line-height: 1.5;
+}
+.login-card .config-warn-login.show { display: block; }
+.login-card .config-warn-login code {
+  background: var(--bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--accent);
+  font-size: 10px;
+}
+
+body.locked { overflow: hidden; }
+body.locked > .wrap { filter: blur(12px); pointer-events: none; user-select: none; }
+body {
+  font-family: 'Space Mono', ui-monospace, monospace;
+  background:
+    radial-gradient(ellipse at top left, rgba(0,229,255,0.08), transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(255,107,53,0.06), transparent 50%),
+    var(--bg);
+  color: var(--text); min-height: 100vh; padding: 24px;
+}
+.wrap { max-width: 1280px; margin: 0 auto; }
+.hdr {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 16px; margin-bottom: 24px;
+  padding-bottom: 18px; border-bottom: 1px solid var(--border);
+}
+.hdr-l h1 {
+  font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 900;
+  letter-spacing: 3px;
+  background: linear-gradient(135deg, var(--accent), #fff, var(--accent2));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hdr-l .sub { font-size: 11px; color: var(--dim); letter-spacing: 2px; margin-top: 4px; }
+.hdr-r { display: flex; gap: 10px; flex-wrap: wrap; }
+.hdr-r button {
+  background: var(--panel); border: 1px solid var(--border); color: var(--text);
+  font-family: 'Orbitron', sans-serif; font-size: 11px; letter-spacing: 1.5px;
+  padding: 9px 16px; border-radius: 8px; cursor: pointer; transition: all 0.2s;
+  display: inline-flex; align-items: center; gap: 7px;
+}
+.hdr-r button:hover { border-color: var(--accent); color: var(--accent); }
+.hdr-r button.primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #000; border: none; }
+.hdr-r .ico { width: 14px; height: 14px; }
+.config-warn {
+  background: rgba(255,184,77,0.08); border: 1px solid rgba(255,184,77,0.4);
+  padding: 14px 18px; border-radius: 10px; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.config-warn .ico { width: 20px; height: 20px; color: var(--warn); flex-shrink: 0; }
+.config-warn-txt { flex: 1; font-size: 13px; }
+.config-warn-txt strong { color: var(--warn); }
+.config-warn code {
+  background: var(--bg2); padding: 2px 8px; border-radius: 4px;
+  color: var(--accent); font-size: 12px;
+}
+.kpi-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px; margin-bottom: 24px;
+}
+.kpi {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px 20px; position: relative; overflow: hidden;
+}
+.kpi::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+}
+.kpi-lbl {
+  font-size: 10px; color: var(--dim); letter-spacing: 2px;
+  text-transform: uppercase; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.kpi-lbl .ico { width: 12px; height: 12px; color: var(--accent); }
+.kpi-val {
+  font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 900;
+  color: var(--accent); line-height: 1;
+}
+.kpi-sub { font-size: 11px; color: var(--dim); margin-top: 6px; }
+.row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 24px;
+}
+@media (max-width: 900px) { .row { grid-template-columns: 1fr; } }
+.section {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; overflow: hidden;
+}
+.section-hdr {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+  padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.section-hdr .ico { width: 16px; height: 16px; color: var(--accent2); }
+.section-hdr h2 {
+  font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 2px;
+}
+.top10 { display: flex; flex-direction: column; gap: 8px; }
+.top10-row {
+  display: grid; grid-template-columns: 28px 1fr auto auto; gap: 10px;
+  align-items: center; padding: 8px 10px; border-radius: 6px;
+  font-size: 13px; transition: background 0.15s;
+}
+.top10-row:hover { background: rgba(0,229,255,0.05); }
+.top10-rank {
+  font-family: 'Orbitron', sans-serif; font-weight: 700; color: var(--dim);
+  text-align: center; font-size: 12px;
+}
+.top10-row.gold .top10-rank { color: var(--gold); }
+.top10-row.silver .top10-rank { color: #c0c0c0; }
+.top10-row.bronze .top10-rank { color: #cd7f32; }
+.top10-name { font-weight: 700; }
+.top10-country {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--accent2); font-size: 12px;
+}
+.top10-score {
+  font-family: 'Orbitron', sans-serif; color: var(--gold); font-weight: 700;
+}
+.bars { display: flex; flex-direction: column; gap: 9px; }
+.bar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.bar-lbl {
+  width: 120px; flex-shrink: 0; font-weight: 700;
+  font-family: 'Orbitron', sans-serif; font-size: 11px;
+}
+.bar-track {
+  flex: 1; height: 14px; background: var(--bg2); border-radius: 4px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 4px; transition: width 0.5s;
+}
+.bar-val {
+  width: 40px; text-align: right; color: var(--dim); font-size: 11px;
+}
+.filters {
+  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  margin-bottom: 14px;
+}
+.filters input, .filters select {
+  background: var(--bg2); border: 1px solid var(--border); color: var(--text);
+  font-family: 'Space Mono', monospace; font-size: 12px;
+  padding: 8px 12px; border-radius: 6px;
+}
+.filters input { flex: 1; min-width: 180px; }
+.filters input:focus, .filters select:focus { outline: none; border-color: var(--accent); }
+.filters .clear {
+  background: transparent; border: 1px solid var(--border); color: var(--dim);
+  font-size: 11px; padding: 8px 14px; border-radius: 6px; cursor: pointer;
+}
+.filters .clear:hover { color: var(--accent); border-color: var(--accent); }
+.tbl-wrap { overflow-x: auto; max-height: 540px; overflow-y: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+thead th {
+  background: var(--bg2); color: var(--dim);
+  font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 1.5px; padding: 10px 12px; text-align: left;
+  position: sticky; top: 0; border-bottom: 2px solid var(--border);
+  white-space: nowrap; cursor: pointer; user-select: none;
+}
+thead th:hover { color: var(--accent); }
+thead th .arrow { font-size: 9px; opacity: 0.5; margin-left: 4px; }
+thead th.sorted .arrow { opacity: 1; color: var(--accent); }
+tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; }
+tbody tr:hover { background: rgba(0,229,255,0.04); }
+tbody td { padding: 10px 12px; white-space: nowrap; }
+tbody td.num { text-align: right; font-family: 'Orbitron', sans-serif; }
+tbody td.score { color: var(--gold); font-weight: 700; }
+.empty {
+  text-align: center; padding: 60px 20px; color: var(--dim);
+}
+.empty h3 {
+  font-family: 'Orbitron', sans-serif; font-size: 16px; color: var(--text);
+  margin-bottom: 8px; letter-spacing: 2px;
+}
+.loader {
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px; gap: 12px; color: var(--dim); font-size: 13px;
+}
+.spinner {
+  width: 20px; height: 20px; border: 2px solid var(--border);
+  border-top-color: var(--accent); border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.foot {
+  margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);
+  text-align: center; color: var(--dim); font-size: 11px; letter-spacing: 1px;
+}
+.foot strong { color: var(--accent); }
+</style>
+</head>
+<body class="locked">
+
+<!-- ═══ LOGIN OVERLAY AES-256-GCM ═══ -->
+<div id="login-overlay">
+  <div class="login-card">
+    <h1>DASHBOARD DOCENTE</h1>
+    <div class="sub">GEODASH EUROPA · ACCESSO RISERVATO</div>
+    <form onsubmit="event.preventDefault(); tryLogin();">
+      <input type="password" id="login-pwd" placeholder="PASSWORD" autocomplete="off" autofocus>
+      <button type="submit" id="login-btn">ACCEDI</button>
+    </form>
+    <div class="err" id="login-err">Password errata</div>
+    <div class="config-warn-login" id="config-warn-login">
+      <strong>⚠ Configurazione mancante.</strong> Il file <code>ENCRYPTED_PASSWORD</code> contiene ancora <code>PLACEHOLDER</code>. Apri <code>cripto-password.html</code>, genera il blob e incollalo nella variabile <code>ENCRYPTED_PASSWORD</code> dentro questo file.
+    </div>
+  </div>
+</div>
+
+<svg style="display:none">
+  <symbol id="i-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V4h12v5a6 6 0 0 1-12 0z"/><path d="M5 9H3a2 2 0 0 0 0 4h2"/><path d="M19 9h2a2 2 0 0 1 0 4h-2"/><path d="M9 21h6M12 16v5"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><circle cx="17" cy="7" r="3"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V4h12l-2 4 2 4H4"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m-5-5l5 5 5-5"/><path d="M5 21h14"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.86L1.82 18a2 2 0 0 0 1.7 3h16.96a2 2 0 0 0 1.7-3L13.7 3.86a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 9 22 10 17 14 18 21 12 17 6 21 7 14 2 10 9 9"/></symbol>
+</svg>
+
+<div class="wrap">
+  <header class="hdr">
+    <div class="hdr-l">
+      <h1>GEODASH EUROPA</h1>
+      <div class="sub">DASHBOARD DOCENTE · MONITORAGGIO RISULTATI</div>
+    </div>
+    <div class="hdr-r">
+      <button onclick="caricaDati()" class="primary"><svg class="ico"><use href="#i-refresh"/></svg>AGGIORNA</button>
+      <button onclick="esportaCSV()"><svg class="ico"><use href="#i-download"/></svg>CSV</button>
+    </div>
+  </header>
+
+  <div id="config-warn" class="config-warn" style="display:none">
+    <svg class="ico"><use href="#i-warn"/></svg>
+    <div class="config-warn-txt">
+      <strong>APPS_SCRIPT_URL non configurato.</strong> Apri questo file in editor e incolla l'URL del web app nella variabile <code>APPS_SCRIPT_URL</code>.
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-lbl"><svg class="ico"><use href="#i-users"/></svg>PARTITE TOTALI</div>
+      <div class="kpi-val" id="kpi-tot">—</div>
+      <div class="kpi-sub" id="kpi-tot-sub">In attesa dati</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl"><svg class="ico"><use href="#i-star"/></svg>SCORE MEDIO</div>
+      <div class="kpi-val" id="kpi-avg">—</div>
+      <div class="kpi-sub" id="kpi-avg-sub">su 1000 punti</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl"><svg class="ico"><use href="#i-trophy"/></svg>SCORE MAX</div>
+      <div class="kpi-val" id="kpi-max">—</div>
+      <div class="kpi-sub" id="kpi-max-sub">—</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl"><svg class="ico"><use href="#i-flag"/></svg>PAESE PIÙ SCELTO</div>
+      <div class="kpi-val" id="kpi-top-country" style="font-size:18px">—</div>
+      <div class="kpi-sub" id="kpi-top-country-sub">—</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="section">
+      <div class="section-hdr">
+        <svg class="ico"><use href="#i-trophy"/></svg>
+        <h2>TOP 10 RANKING</h2>
+      </div>
+      <div class="top10" id="top10"><div class="empty">In attesa dati</div></div>
+    </div>
+    <div class="section">
+      <div class="section-hdr">
+        <svg class="ico"><use href="#i-chart"/></svg>
+        <h2>DISTRIBUZIONE PAESI</h2>
+      </div>
+      <div class="bars" id="bars"><div class="empty">In attesa dati</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-hdr">
+      <svg class="ico"><use href="#i-list"/></svg>
+      <h2>TUTTI I RISULTATI</h2>
+    </div>
+    <div class="filters">
+      <input type="text" id="f-name" placeholder="Cerca per nome..." oninput="renderTbl()">
+      <select id="f-country" onchange="renderTbl()">
+        <option value="">Tutti i paesi</option>
+      </select>
+      <select id="f-min" onchange="renderTbl()">
+        <option value="0">Score: tutti</option>
+        <option value="200">≥ 200</option>
+        <option value="400">≥ 400</option>
+        <option value="600">≥ 600</option>
+        <option value="800">≥ 800</option>
+      </select>
+      <button class="clear" onclick="resetFiltri()">RESET</button>
+    </div>
+    <div class="tbl-wrap">
+      <table id="tbl">
+        <thead>
+          <tr>
+            <th onclick="ordina('ts')">Data <span class="arrow"></span></th>
+            <th onclick="ordina('name')">Nome <span class="arrow"></span></th>
+            <th onclick="ordina('country')">Paese <span class="arrow"></span></th>
+            <th onclick="ordina('score')" class="sorted">Score <span class="arrow">▼</span></th>
+            <th onclick="ordina('quiz')">Quiz <span class="arrow"></span></th>
+            <th onclick="ordina('correct')">Corr. <span class="arrow"></span></th>
+            <th onclick="ordina('health')">Salute <span class="arrow"></span></th>
+            <th onclick="ordina('cons')">Cons. <span class="arrow"></span></th>
+            <th onclick="ordina('eco')">Econ. <span class="arrow"></span></th>
+            <th onclick="ordina('mort')">Mort. <span class="arrow"></span></th>
+            <th onclick="ordina('duration')">Durata <span class="arrow"></span></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="foot">
+    Progetto Ferraboschi/Cerioli · Scuola Sacra Famiglia Orzinuovi · <strong>GeoDash Europa</strong>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// AUTH AES-256-GCM
+// Andrea: genera il blob con cripto-password.html e incollalo qui
+// ═══════════════════════════════════════════════════════════
+const ENCRYPTED_PASSWORD = "AotfJ4RTNZ01ep6xitE14uc9oNul576r1DWYIhpkln0JhMYFLHTW3ZU8j8fPsyztGHuI3jUHC4Nw0C0=";
+
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzJG_TgMbaflZzuxrWhrx9JhFMcStyMMqzesAFQ7XMqf0TxdbiV-mb4r1AKq6PUx-DIUw/exec"; // ⚠ Andrea: incolla qui l'URL del web app
+
+// ─── AES helpers ──────────────────────────────────────────
+async function _deriveKey(pwd, salt) {
+  const enc = new TextEncoder();
+  const km = await crypto.subtle.importKey(
+    "raw", enc.encode(pwd), { name: "PBKDF2" }, false, ["deriveKey"]
+  );
+  return crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt: salt, iterations: 250000, hash: "SHA-256" },
+    km,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["decrypt"]
+  );
+}
+
+function _b64ToBytes(b64) {
+  const bin = atob(b64);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+async function _verifyPwd(pwd) {
+  if (!ENCRYPTED_PASSWORD || ENCRYPTED_PASSWORD === "PLACEHOLDER") return null;
+  try {
+    const buf = _b64ToBytes(ENCRYPTED_PASSWORD);
+    const salt = buf.slice(0, 16);
+    const iv = buf.slice(16, 28);
+    const ct = buf.slice(28);
+    const key = await _deriveKey(pwd, salt);
+    const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, ct);
+    return new TextDecoder().decode(pt) === "GEODASH_OK_2026";
+  } catch (e) {
+    return false;
+  }
+}
+
+async function tryLogin() {
+  const pwd = document.getElementById("login-pwd").value;
+  const btn = document.getElementById("login-btn");
+  const err = document.getElementById("login-err");
+  const inp = document.getElementById("login-pwd");
+  err.classList.remove("show");
+  btn.disabled = true; btn.textContent = "VERIFICO...";
+  const ok = await _verifyPwd(pwd);
+  btn.disabled = false; btn.textContent = "ACCEDI";
+  if (ok === null) {
+    document.getElementById("config-warn-login").classList.add("show");
+    return;
+  }
+  if (ok) {
+    document.getElementById("login-overlay").style.display = "none";
+    document.body.classList.remove("locked");
+    if (typeof caricaDati === "function") caricaDati();
+  } else {
+    err.classList.add("show");
+    inp.classList.add("shake");
+    setTimeout(() => inp.classList.remove("shake"), 500);
+    inp.value = ""; inp.focus();
+  }
+}
+
+// Mostra warning se non configurato
+if (ENCRYPTED_PASSWORD === "PLACEHOLDER") {
+  window.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("config-warn-login").classList.add("show");
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// DASHBOARD LOGIC
+// ═══════════════════════════════════════════════════════════
+
+let DATI = [];
+let SORT_KEY = "score";
+let SORT_DIR = "desc";
+
+function caricaDati() {
+  if (!APPS_SCRIPT_URL) {
+    document.getElementById("config-warn").style.display = "flex";
+    return;
+  }
+  const top10 = document.getElementById("top10");
+  const bars = document.getElementById("bars");
+  top10.innerHTML = '<div class="loader"><div class="spinner"></div>Caricamento...</div>';
+  bars.innerHTML = '<div class="loader"><div class="spinner"></div>Caricamento...</div>';
+
+  const cb = "cb_" + Date.now();
+  window[cb] = function(data) {
+    delete window[cb];
+    if (s.parentNode) document.head.removeChild(s);
+    if (data && data.results) { DATI = data.results; aggiorna(); }
+    else { top10.innerHTML = '<div class="empty"><h3>Nessun dato</h3>Risposta non valida</div>'; }
+  };
+  const s = document.createElement("script");
+  s.src = APPS_SCRIPT_URL + "?action=list&callback=" + cb;
+  s.onerror = function() {
+    delete window[cb];
+    top10.innerHTML = '<div class="empty"><h3>Errore connessione</h3>Verifica APPS_SCRIPT_URL</div>';
+    bars.innerHTML = '';
+  };
+  document.head.appendChild(s);
+}
+
+function aggiorna() {
+  const tot = DATI.length;
+  document.getElementById("kpi-tot").textContent = tot;
+  document.getElementById("kpi-tot-sub").textContent = tot === 1 ? "1 partita registrata" : tot + " partite registrate";
+
+  if (tot === 0) {
+    document.getElementById("kpi-avg").textContent = "—";
+    document.getElementById("kpi-max").textContent = "—";
+    document.getElementById("kpi-top-country").textContent = "—";
+    document.getElementById("top10").innerHTML = '<div class="empty"><h3>Nessuna partita</h3>Attendi che gli studenti giochino</div>';
+    document.getElementById("bars").innerHTML = '<div class="empty">—</div>';
+    populaFiltroPaesi(); renderTbl(); return;
+  }
+
+  const scores = DATI.map(d => +d.score || 0);
+  const avg = Math.round(scores.reduce((a,b) => a+b, 0) / tot);
+  const max = Math.max(...scores);
+  const maxRow = DATI.find(d => +d.score === max);
+  document.getElementById("kpi-avg").textContent = avg;
+  document.getElementById("kpi-max").textContent = max;
+  document.getElementById("kpi-max-sub").textContent = maxRow ? maxRow.name : "";
+
+  const cntCountry = {};
+  DATI.forEach(d => {
+    const c = d.country || d.code || "—";
+    cntCountry[c] = (cntCountry[c] || 0) + 1;
+  });
+  const topC = Object.entries(cntCountry).sort((a,b) => b[1] - a[1])[0];
+  document.getElementById("kpi-top-country").textContent = topC[0];
+  document.getElementById("kpi-top-country-sub").textContent = topC[1] + (topC[1] === 1 ? " partita" : " partite");
+
+  const top = [...DATI].sort((a,b) => +b.score - +a.score).slice(0, 10);
+  document.getElementById("top10").innerHTML = top.map((d, i) => {
+    const cls = i === 0 ? "gold" : i === 1 ? "silver" : i === 2 ? "bronze" : "";
+    return '<div class="top10-row ' + cls + '">' +
+      '<div class="top10-rank">#' + (i+1) + '</div>' +
+      '<div class="top10-name">' + escapeHtml(d.name || "Anonimo") + '</div>' +
+      '<div class="top10-country">' + escapeHtml(d.country || d.code || "") + '</div>' +
+      '<div class="top10-score">' + (+d.score || 0) + '</div>' +
+    '</div>';
+  }).join("");
+
+  const maxCnt = Math.max(...Object.values(cntCountry));
+  document.getElementById("bars").innerHTML = Object.entries(cntCountry)
+    .sort((a,b) => b[1] - a[1])
+    .map(([c, n]) => {
+      const pct = (n / maxCnt) * 100;
+      return '<div class="bar-row">' +
+        '<div class="bar-lbl">' + escapeHtml(c) + '</div>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div>' +
+        '<div class="bar-val">' + n + '</div>' +
+      '</div>';
+    }).join("");
+
+  populaFiltroPaesi();
+  renderTbl();
+}
+
+function populaFiltroPaesi() {
+  const sel = document.getElementById("f-country");
+  const cur = sel.value;
+  const paesi = [...new Set(DATI.map(d => d.country || d.code || "—"))].sort();
+  sel.innerHTML = '<option value="">Tutti i paesi</option>' +
+    paesi.map(p => '<option value="' + escapeHtml(p) + '">' + escapeHtml(p) + '</option>').join("");
+  if (paesi.includes(cur)) sel.value = cur;
+}
+
+function filtraDati() {
+  const fName = document.getElementById("f-name").value.toLowerCase().trim();
+  const fCountry = document.getElementById("f-country").value;
+  const fMin = +document.getElementById("f-min").value;
+  return DATI.filter(d => {
+    if (fName && !(d.name || "").toLowerCase().includes(fName)) return false;
+    if (fCountry && (d.country || d.code) !== fCountry) return false;
+    if ((+d.score || 0) < fMin) return false;
+    return true;
+  });
+}
+
+function renderTbl() {
+  const tbody = document.getElementById("tbody");
+  let dati = filtraDati();
+  dati.sort((a,b) => {
+    let av = a[SORT_KEY], bv = b[SORT_KEY];
+    if (SORT_KEY === "ts") {
+      av = new Date(av).getTime() || 0;
+      bv = new Date(bv).getTime() || 0;
+    } else if (typeof av === "string" && isNaN(+av)) {
+      return SORT_DIR === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+    } else {
+      av = +av || 0; bv = +bv || 0;
+    }
+    return SORT_DIR === "asc" ? av - bv : bv - av;
+  });
+
+  if (dati.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="11" class="empty">Nessun risultato con i filtri attivi</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = dati.map(d => {
+    const dt = new Date(d.ts);
+    const dtStr = isNaN(dt) ? (d.ts || "") :
+      dt.toLocaleDateString("it-IT", {day:"2-digit",month:"2-digit",year:"2-digit"}) + " " +
+      dt.toLocaleTimeString("it-IT", {hour:"2-digit",minute:"2-digit"});
+    return '<tr>' +
+      '<td>' + escapeHtml(dtStr) + '</td>' +
+      '<td><strong>' + escapeHtml(d.name || "Anonimo") + '</strong></td>' +
+      '<td>' + escapeHtml(d.country || d.code || "—") + '</td>' +
+      '<td class="num score">' + (+d.score || 0) + '</td>' +
+      '<td class="num">' + (+d.quiz || 0) + '</td>' +
+      '<td class="num">' + (+d.correct || 0) + '/30</td>' +
+      '<td class="num">' + (+d.health || 0) + '</td>' +
+      '<td class="num">' + (+d.cons || 0) + '</td>' +
+      '<td class="num">' + (+d.eco || 0) + '</td>' +
+      '<td class="num">' + (+d.mort || 0) + '</td>' +
+      '<td class="num">' + formatDuration(+d.duration || 0) + '</td>' +
+    '</tr>';
+  }).join("");
+}
+
+function ordina(key) {
+  if (SORT_KEY === key) {
+    SORT_DIR = SORT_DIR === "asc" ? "desc" : "asc";
+  } else {
+    SORT_KEY = key; SORT_DIR = "desc";
+  }
+  document.querySelectorAll("thead th").forEach(th => {
+    th.classList.remove("sorted");
+    const arrow = th.querySelector(".arrow");
+    if (arrow) arrow.textContent = "";
+  });
+  const ths = document.querySelectorAll("thead th");
+  const idx = ["ts","name","country","score","quiz","correct","health","cons","eco","mort","duration"].indexOf(key);
+  if (idx >= 0) {
+    ths[idx].classList.add("sorted");
+    ths[idx].querySelector(".arrow").textContent = SORT_DIR === "asc" ? "▲" : "▼";
+  }
+  renderTbl();
+}
+
+function resetFiltri() {
+  document.getElementById("f-name").value = "";
+  document.getElementById("f-country").value = "";
+  document.getElementById("f-min").value = "0";
+  renderTbl();
+}
+
+function esportaCSV() {
+  if (DATI.length === 0) { alert("Nessun dato da esportare"); return; }
+  const dati = filtraDati();
+  const headers = ["Timestamp","Nome","Paese","Codice","Score","Quiz","Corrette","Salute","Consenso","Economia","Mortalita","Durata(s)"];
+  const rows = dati.map(d => [
+    d.ts || "", d.name || "", d.country || "", d.code || "",
+    +d.score || 0, +d.quiz || 0, +d.correct || 0,
+    +d.health || 0, +d.cons || 0, +d.eco || 0, +d.mort || 0,
+    +d.duration || 0
+  ]);
+  const csv = [headers, ...rows].map(r =>
+    r.map(c => {
+      const s = String(c);
+      return /[",;\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    }).join(";")
+  ).join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const today = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = "geodash-europa-" + today + ".csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function escapeHtml(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function formatDuration(s) {
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return m > 0 ? m + "m " + r + "s" : s + "s";
+}
+
+// caricaDati viene chiamata da tryLogin() dopo autenticazione AES riuscita
+</script>
+
+</body>
+</html>
