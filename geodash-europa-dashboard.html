@@ -169,6 +169,159 @@ body {
 }
 .hdr-r button:hover { border-color: var(--accent); color: var(--accent); }
 .hdr-r button.primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #000; border: none; }
+.hdr-r button.autoref-on {
+  border-color: var(--accent3); color: var(--accent3);
+  box-shadow: 0 0 12px rgba(57,255,20,0.3);
+}
+.hdr-r button.autoref-on .ico { animation: spin-slow 2s linear infinite; }
+@keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.hdr-r button.danger {
+  border-color: rgba(255,184,77,0.4); color: var(--warn);
+}
+.hdr-r button.danger:hover {
+  border-color: var(--warn);
+  background: rgba(255,184,77,0.08);
+  color: var(--warn);
+}
+
+/* ─── MODAL CONFERMA AZZERAMENTO ─── */
+#azzera-overlay {
+  position: fixed; inset: 0; z-index: 9998;
+  background: rgba(5,11,26,0.85);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+#azzera-overlay.show { display: flex; animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.azzera-modal {
+  background: var(--panel);
+  border: 1px solid rgba(255,184,77,0.4);
+  border-radius: 18px;
+  padding: 32px 30px;
+  max-width: 480px; width: 100%;
+  box-shadow: 0 0 0 1px rgba(255,184,77,0.15), 0 0 60px rgba(255,184,77,0.12);
+}
+.azzera-modal h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px; font-weight: 900;
+  color: var(--warn);
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.azzera-modal h2 .ico { font-size: 22px; }
+.azzera-modal p {
+  font-size: 13px; color: var(--text); line-height: 1.55;
+  margin-bottom: 18px;
+}
+.azzera-modal p strong { color: var(--warn); }
+.azzera-modal .count {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  color: var(--accent);
+  margin-bottom: 16px;
+  text-align: center;
+}
+.azzera-modal .count strong { color: var(--gold); font-size: 18px; }
+.azzera-modal label {
+  display: block;
+  font-size: 11px;
+  color: var(--dim);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.azzera-modal label code {
+  background: var(--bg);
+  padding: 2px 7px; border-radius: 4px;
+  color: var(--warn); font-size: 11px;
+}
+.azzera-modal input[type="text"] {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'Space Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-align: center;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  transition: all 0.2s;
+}
+.azzera-modal input[type="text"]:focus {
+  outline: none;
+  border-color: var(--warn);
+  box-shadow: 0 0 0 3px rgba(255,184,77,0.12);
+}
+.azzera-modal .actions {
+  display: flex; gap: 10px;
+}
+.azzera-modal .actions button {
+  flex: 1;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.azzera-modal .btn-cancel {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--dim);
+}
+.azzera-modal .btn-cancel:hover {
+  color: var(--text);
+  border-color: var(--text);
+}
+.azzera-modal .btn-confirm {
+  background: var(--warn);
+  border: 1px solid var(--warn);
+  color: #000;
+}
+.azzera-modal .btn-confirm:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: transparent;
+  color: var(--dim);
+  border-color: var(--border);
+}
+.azzera-modal .btn-confirm:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255,184,77,0.3);
+}
+.azzera-modal .status {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: 'Space Mono', monospace;
+  display: none;
+}
+.azzera-modal .status.show { display: block; }
+.azzera-modal .status.ok {
+  background: rgba(57,255,20,0.1);
+  border-left: 3px solid var(--accent3);
+  color: var(--accent3);
+}
+.azzera-modal .status.err {
+  background: rgba(255,184,77,0.1);
+  border-left: 3px solid var(--warn);
+  color: var(--warn);
+}
 .hdr-r .ico { width: 14px; height: 14px; }
 .config-warn {
   background: rgba(255,184,77,0.08); border: 1px solid rgba(255,184,77,0.4);
@@ -356,6 +509,7 @@ tbody td.score { color: var(--gold); font-weight: 700; }
     </div>
     <div class="hdr-r">
       <button onclick="caricaDati()" class="primary"><svg class="ico"><use href="#i-refresh"/></svg>AGGIORNA</button>
+      <button id="autoref-btn" onclick="toggleAutoRefresh()" title="Aggiornamento automatico ogni 15s"><svg class="ico"><use href="#i-refresh"/></svg><span id="autoref-lbl">AUTO OFF</span></button>
       <button onclick="esportaCSV()"><svg class="ico"><use href="#i-download"/></svg>CSV</button>
     </div>
   </header>
@@ -424,7 +578,7 @@ tbody td.score { color: var(--gold); font-weight: 700; }
         <option value="600">≥ 600</option>
         <option value="800">≥ 800</option>
       </select>
-      <button class="clear" onclick="resetFiltri()">RESET</button>
+      <button class="clear" onclick="apriAzzera()" title="Cancella TUTTE le partite dal Sheet">RESET</button>
     </div>
     <div class="tbl-wrap">
       <table id="tbl">
@@ -458,7 +612,7 @@ tbody td.score { color: var(--gold); font-weight: 700; }
 // AUTH AES-256-GCM
 // Andrea: genera il blob con cripto-password.html e incollalo qui
 // ═══════════════════════════════════════════════════════════
-const ENCRYPTED_PASSWORD = "AotfJ4RTNZ01ep6xitE14uc9oNul576r1DWYIhpkln0JhMYFLHTW3ZU8j8fPsyztGHuI3jUHC4Nw0C0=";
+const ENCRYPTED_PASSWORD = "SctyhICcT2v7d236xRzk4w1AiSIDwuHqp765OGoDpp+GyhyixNxj8gTjDwUiIRdbzXfe4g058WMo8Gc=";
 
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzJG_TgMbaflZzuxrWhrx9JhFMcStyMMqzesAFQ7XMqf0TxdbiV-mb4r1AKq6PUx-DIUw/exec"; // ⚠ Andrea: incolla qui l'URL del web app
 
@@ -752,7 +906,134 @@ function formatDuration(s) {
 }
 
 // caricaDati viene chiamata da tryLogin() dopo autenticazione AES riuscita
+
+// ─── AUTO-REFRESH ───
+let _autoRefreshTimer = null;
+function toggleAutoRefresh() {
+  const btn = document.getElementById("autoref-btn");
+  const lbl = document.getElementById("autoref-lbl");
+  if (_autoRefreshTimer) {
+    clearInterval(_autoRefreshTimer);
+    _autoRefreshTimer = null;
+    btn.classList.remove("autoref-on");
+    lbl.textContent = "AUTO OFF";
+  } else {
+    _autoRefreshTimer = setInterval(caricaDati, 15000);
+    btn.classList.add("autoref-on");
+    lbl.textContent = "AUTO ON";
+    caricaDati();
+  }
+}
+
+// ─── AZZERA DATI (cancellazione permanente) ───
+function apriAzzera() {
+  const overlay = document.getElementById("azzera-overlay");
+  const count = document.getElementById("azzera-count");
+  const input = document.getElementById("azzera-input");
+  const btn = document.getElementById("azzera-btn");
+  const status = document.getElementById("azzera-status");
+  const n = (DATI || []).length;
+  count.innerHTML = "<strong>" + n + "</strong> " + (n === 1 ? "partita verrà cancellata" : "partite verranno cancellate");
+  input.value = "";
+  btn.disabled = true;
+  status.classList.remove("show", "ok", "err");
+  status.textContent = "";
+  overlay.classList.add("show");
+  setTimeout(() => input.focus(), 100);
+}
+
+function chiudiAzzera() {
+  document.getElementById("azzera-overlay").classList.remove("show");
+}
+
+function checkAzzeraInput() {
+  const v = document.getElementById("azzera-input").value.trim().toUpperCase();
+  document.getElementById("azzera-btn").disabled = (v !== "AZZERA");
+}
+
+function confermaAzzera() {
+  const btn = document.getElementById("azzera-btn");
+  const status = document.getElementById("azzera-status");
+  if (!APPS_SCRIPT_URL) {
+    status.className = "status show err";
+    status.textContent = "APPS_SCRIPT_URL non configurato.";
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = "CANCELLO...";
+  status.className = "status show ok";
+  status.textContent = "Invio richiesta al server...";
+
+  const cb = "cb_clear_" + Date.now();
+  let s = null;
+  let timeout = null;
+
+  window[cb] = function(resp) {
+    delete window[cb];
+    if (timeout) clearTimeout(timeout);
+    if (s && s.parentNode) document.head.removeChild(s);
+    if (resp && resp.ok) {
+      status.className = "status show ok";
+      status.textContent = "Cancellate " + resp.deleted + " partite. Aggiornamento in corso...";
+      setTimeout(() => {
+        chiudiAzzera();
+        caricaDati();
+      }, 1500);
+    } else {
+      status.className = "status show err";
+      status.textContent = "Errore: " + ((resp && resp.error) || "risposta non valida");
+      btn.disabled = false; btn.textContent = "CANCELLA TUTTO";
+    }
+  };
+
+  s = document.createElement("script");
+  s.src = APPS_SCRIPT_URL + "?action=clear&callback=" + cb;
+  s.onerror = function() {
+    delete window[cb];
+    if (timeout) clearTimeout(timeout);
+    status.className = "status show err";
+    status.textContent = "Errore connessione al server. Verifica l'URL Apps Script.";
+    btn.disabled = false; btn.textContent = "CANCELLA TUTTO";
+  };
+
+  // Timeout di sicurezza 20s
+  timeout = setTimeout(() => {
+    if (window[cb]) {
+      delete window[cb];
+      if (s && s.parentNode) document.head.removeChild(s);
+      status.className = "status show err";
+      status.textContent = "Timeout. Verifica deploy Apps Script (nuova versione?).";
+      btn.disabled = false; btn.textContent = "CANCELLA TUTTO";
+    }
+  }, 20000);
+
+  document.head.appendChild(s);
+}
+
+// Chiusura modal con Esc
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    const ov = document.getElementById("azzera-overlay");
+    if (ov && ov.classList.contains("show")) chiudiAzzera();
+  }
+});
 </script>
+
+<!-- ═══ MODAL CONFERMA AZZERAMENTO DATI ═══ -->
+<div id="azzera-overlay">
+  <div class="azzera-modal">
+    <h2><svg class="ico"><use href="#i-warn"/></svg>Cancellazione dati</h2>
+    <p>Stai per <strong>cancellare in modo permanente</strong> tutte le partite registrate sul Google Sheet. L'operazione <strong>non è reversibile</strong>: nessun backup automatico.</p>
+    <div class="count" id="azzera-count">— partite verranno cancellate</div>
+    <label>Per confermare scrivi <code>AZZERA</code> qui sotto:</label>
+    <input type="text" id="azzera-input" placeholder="AZZERA" autocomplete="off" oninput="checkAzzeraInput()">
+    <div class="actions">
+      <button class="btn-cancel" onclick="chiudiAzzera()">ANNULLA</button>
+      <button class="btn-confirm" id="azzera-btn" onclick="confermaAzzera()" disabled>CANCELLA TUTTO</button>
+    </div>
+    <div class="status" id="azzera-status"></div>
+  </div>
+</div>
 
 </body>
 </html>
